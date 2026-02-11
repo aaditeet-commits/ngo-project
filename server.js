@@ -10,10 +10,11 @@ const app = express();
 
 // Database connection
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'ngo_website'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT
 });
 
 db.connect((err) => {
@@ -105,17 +106,19 @@ app.post('/admin/login', (req, res) => {
     db.query('SELECT * FROM admin WHERE username = ?', [username], async (err, results) => {
         if (err) throw err;
 
-      if (results.length > 0) {
-    const admin = results[0];
+        if (results.length > 0) {
+            const admin = results[0];
+            const match = await bcrypt.compare(password, admin.password);
 
-    if (password === 'admin123') {
-        req.session.admin = admin;
-        res.redirect('/admin/dashboard');
-    } else {
-        res.render('admin/login', { error: 'Invalid credentials' });
-    }
-}
-
+            if (match) {
+                req.session.admin = admin;
+                res.redirect('/admin/dashboard');
+            } else {
+                res.render('admin/login', { error: 'Invalid credentials' });
+            }
+        } else {
+            res.render('admin/login', { error: 'Invalid credentials' });
+        }
     });
 });
 
