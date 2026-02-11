@@ -22,8 +22,60 @@ db.connect((err) => {
         console.error('Database connection failed:', err);
     } else {
         console.log('Connected to MySQL database');
+
+        // Create tables automatically
+        const createTables = `
+        CREATE TABLE IF NOT EXISTS admin (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50),
+            password VARCHAR(255)
+        );
+
+        CREATE TABLE IF NOT EXISTS banners (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            image_url VARCHAR(255),
+            title VARCHAR(100),
+            description TEXT,
+            display_order INT,
+            status TINYINT DEFAULT 1
+        );
+
+        CREATE TABLE IF NOT EXISTS vision_mission (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            vision_title VARCHAR(100),
+            vision_description TEXT,
+            mission_title VARCHAR(100),
+            mission_description TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS statistics (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            label VARCHAR(100),
+            value VARCHAR(50),
+            display_order INT,
+            status TINYINT DEFAULT 1
+        );
+
+        CREATE TABLE IF NOT EXISTS initiatives (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            title VARCHAR(100),
+            description TEXT,
+            image_url VARCHAR(255),
+            display_order INT,
+            status TINYINT DEFAULT 1
+        );
+        `;
+
+        db.query(createTables, (err) => {
+            if (err) {
+                console.error('Error creating tables:', err);
+            } else {
+                console.log('Tables created or already exist');
+            }
+        });
     }
 });
+
 
 // Middleware
 app.set('view engine', 'ejs');
